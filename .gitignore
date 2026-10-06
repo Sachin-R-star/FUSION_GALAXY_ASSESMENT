@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+test.html
+test_out.pdf
+test_output/
