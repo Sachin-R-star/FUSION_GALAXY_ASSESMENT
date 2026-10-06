@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim Audit Report - CLAIM-B</title>
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-purple: #a855f7;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 30px 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Header Banner */
+        .header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e293b 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-title h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .header-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+        .badge-blue { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+        .badge-rose { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+        .badge-emerald { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .badge-amber { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+
+        /* Status Alert Card */
+        .status-alert {
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .status-alert.critical {
+            background: rgba(244, 63, 94, 0.12);
+            border: 1px solid rgba(244, 63, 94, 0.35);
+        }
+        .status-alert.verified {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+        .status-alert-content h3 {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+        .status-alert.critical h3 { color: #f43f5e; }
+        .status-alert.verified h3 { color: #10b981; }
+
+        /* Card Section */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Key Value Grids */
+        .kv-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .kv-item {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .kv-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .kv-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f1f5f9;
+            word-break: break-word;
+        }
+
+        .not-available {
+            color: #64748b;
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        /* Tables */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #0f172a;
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 12px 14px;
+            border-bottom: 2px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.6px;
+        }
+
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-color);
+            color: #e2e8f0;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .number-col {
+            text-align: right;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        .center-col {
+            text-align: center;
+        }
+
+        /* Check cards / list */
+        .check-item {
+            background: rgba(15, 23, 42, 0.5);
+            border-left: 4px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .check-item.MISMATCH { border-left-color: var(--accent-rose); }
+        .check-item.MATCH { border-left-color: var(--accent-emerald); }
+        .check-item.INFO { border-left-color: var(--accent-blue); }
+
+        .check-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .check-title {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .check-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">
+                <h1>Claim Audit Report: CLAIM-B</h1>
+                <p>Comprehensive Insurance Claim Reconciliation & Line Item Analysis</p>
+            </div>
+            <div class="header-badges">
+                <span class="badge badge-purple">Vehicle: Mahindra Marazzo M2 diesel (MPV)</span>
+                <span class="badge badge-blue">Loss Date: 2025-04-30</span>
+                <span class="badge badge-amber">Mode: Cashless</span>
+            </div>
+        </div>
+
+        <!-- Audit Alert Banner -->
+        <div class="status-alert critical">
+            <div class="status-alert-content">
+                <h3>Audit Status: CRITICAL DISCREPANCIES DETECTED</h3>
+                <p>Identified 4 total mismatch discrepancies and 5 null/missing data fields across sources.</p>
+            </div>
+            <div>
+                
+                <span class="badge badge-rose">4 Mismatches Found</span>
+                
+            </div>
+        </div>
+
+        <!-- Claim Summary Grid -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📋 Claim Summary</div>
+            </div>
+            <div class="kv-grid">
+                <div class="kv-item">
+                    <div class="kv-label">Claim Reference</div>
+                    <div class="kv-value">CLAIM-B</div>
+                </div>
+                <div class="kv-item">
+                    <div class="kv-label">Vehicle Details</div>
+                    <div class="kv-value">Mahindra Marazzo M2 diesel (MPV)</div>
+                </div>
+                <div class="kv-item">
+                    <div class="kv-label">Date of Loss</div>
+                    <div class="kv-value">2025-04-30</div>
+                </div>
+                <div class="kv-item">
+                    <div class="kv-label">Nature of Loss</div>
+                    <div class="kv-value">Accident External Means</div>
+                </div>
+                <div class="kv-item">
+                    <div class="kv-label">Payment Mode</div>
+                    <div class="kv-value">Cashless</div>
+                </div>
+                <div class="kv-item">
+                    <div class="kv-label">Vehicle Age Depreciation</div>
+                    <div class="kv-value">0%</div>
+                </div>
+            </div>
+            <div style="margin-top: 16px;">
+                <div class="kv-item">
+                    <div class="kv-label">Loss Summary Description</div>
+                    <div class="kv-value" style="font-weight: 400; color: #cbd5e1;">Vehicle struck from behind by a truck while turning; rear damage.</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 16px;">
+                <div class="kv-label" style="margin-bottom: 8px;">Damage Parts Detected in Photos</div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    
+                    <span class="badge badge-blue">📷 Front_Bumper (Damage)</span>
+                    
+                    <span class="badge badge-blue">📷 Rear_Bumper (Damage)</span>
+                    
+                    <span class="badge badge-blue">📷 Left_Taillight (Damage)</span>
+                    
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Totals & Data Sources Comparison -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📊 Claim Totals Reconciliation Across Data Sources</div>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Total Description</th>
+                            <th>Data Source</th>
+                            <th class="number-col">Stated Amount (INR)</th>
+                            <th>Audit Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td style="font-weight: 600;">Claims System Listed Estimate</td>
+                            <td style="color: var(--text-muted); font-size: 13px;">Claims System DB (estimated_amount_listed)</td>
+                            <td class="number-col" style="font-weight: 700; color: #38bdf8;">
+                                ₹26,469.00
+                            </td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Amount registered in insurer claim system record.</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: 600;">Claims System Final Settled Amount</td>
+                            <td style="color: var(--text-muted); font-size: 13px;">Claims System DB (final_settled_amount)</td>
+                            <td class="number-col" style="font-weight: 700; color: #38bdf8;">
+                                ₹20,947.00
+                            </td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Final approved settlement paid to insured/garage.</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: 600;">Stated Total Estimate Cost</td>
+                            <td style="color: var(--text-muted); font-size: 13px;">Garage Estimate Document (stated_total_estimate_cost)</td>
+                            <td class="number-col" style="font-weight: 700; color: #38bdf8;">
+                                ₹29,764.00
+                            </td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Total cost stated at the top of the garage estimate document.</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: 600;">Stated Total Part Cost</td>
+                            <td style="color: var(--text-muted); font-size: 13px;">Garage Estimate Summary (total_part_estimation_cost)</td>
+                            <td class="number-col" style="font-weight: 700; color: #38bdf8;">
+                                ₹8,111.00
+                            </td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Sum of spare parts as stated in garage estimate header.</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: 600;">Stated Total Labour Cost</td>
+                            <td style="color: var(--text-muted); font-size: 13px;">Garage Estimate Summary (labour_estimation_cost)</td>
+                            <td class="number-col" style="font-weight: 700; color: #38bdf8;">
+                                ₹21,653.00
+                            </td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Sum of labour and painting charges in garage estimate header.</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: 600;">Sum of Parsed Line Items (Base)</td>
+                            <td style="color: var(--text-muted); font-size: 13px;">Parsed Itemized Table Sum</td>
+                            <td class="number-col" style="font-weight: 700; color: #38bdf8;">
+                                ₹31,601.62
+                            </td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Sum of base 'part_total' across 5 line items.</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: 600;">Sum of Parsed Parts Lines</td>
+                            <td style="color: var(--text-muted); font-size: 13px;">Parsed Part Lines Sum</td>
+                            <td class="number-col" style="font-weight: 700; color: #38bdf8;">
+                                ₹9,948.62
+                            </td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Sum of base amounts for plastic/metal/other parts.</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: 600;">Sum of Parsed Labour/Paint Lines</td>
+                            <td style="color: var(--text-muted); font-size: 13px;">Parsed Labour Lines Sum</td>
+                            <td class="number-col" style="font-weight: 700; color: #38bdf8;">
+                                ₹21,653.00
+                            </td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Sum of base amounts for denting/painting/labour.</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: 600;">Calculated Net Line Total (with Dep & GST)</td>
+                            <td style="color: var(--text-muted); font-size: 13px;">Dynamic Calculation Engine</td>
+                            <td class="number-col" style="font-weight: 700; color: #38bdf8;">
+                                ₹37,821.62
+                            </td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Calculated total after applying itemized depreciation & GST rates.</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: 600;">Printed Total on Original Estimate Image</td>
+                            <td style="color: var(--text-muted); font-size: 13px;">Garage Estimate Image OCR/Scan</td>
+                            <td class="number-col" style="font-weight: 700; color: #38bdf8;">
+                                ₹29,764.00
+                            </td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Original estimate total visually confirmed on submitted scan/photo.</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Discrepancy & Check Analysis -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">🔍 "Check" Section - Audit Discrepancy Log</div>
+            </div>
+            <div>
+                
+                <div class="check-item MISMATCH">
+                    <div class="check-header">
+                        <div class="check-title">
+                            [CHK_01] Stated Estimate Total vs Parsed Line Items Sum
+                        </div>
+                        <div>
+                            
+                            <span class="badge badge-rose">MISMATCH (6.17%)</span>
+                            
+                        </div>
+                    </div>
+                    <div style="font-size: 13px; display: flex; gap: 20px; color: #e2e8f0; margin-bottom: 6px;">
+                        <span><strong>Stated Estimate Total:</strong> ₹29,764.00</span>
+                        <span><strong>Sum of Parsed Lines (Base):</strong> ₹31,601.62</span>
+                        
+                        <span style="color: #fb7185;"><strong>Variance:</strong> ₹1,837.62</span>
+                        
+                    </div>
+                    <div class="check-desc">Garage stated total (₹29,764.00) differs from the sum of parsed line items (₹31,601.62) by ₹1,837.62 (6.17%). This indicates missing lines or OCR parsing errors in line item extraction.</div>
+                </div>
+                
+                <div class="check-item MISMATCH">
+                    <div class="check-header">
+                        <div class="check-title">
+                            [CHK_02] Claims System Listed Estimate vs Garage Stated Total
+                        </div>
+                        <div>
+                            
+                            <span class="badge badge-rose">MISMATCH (11.07%)</span>
+                            
+                        </div>
+                    </div>
+                    <div style="font-size: 13px; display: flex; gap: 20px; color: #e2e8f0; margin-bottom: 6px;">
+                        <span><strong>Claims System Listed Amount:</strong> ₹26,469.00</span>
+                        <span><strong>Garage Stated Total Cost:</strong> ₹29,764.00</span>
+                        
+                        <span style="color: #fb7185;"><strong>Variance:</strong> ₹3,295.00</span>
+                        
+                    </div>
+                    <div class="check-desc">Claims System listed estimate (₹26,469.00) differs from garage stated total (₹29,764.00) by ₹3,295.00 (11.07%). The claims system recorded a different estimate amount than the submitted garage document.</div>
+                </div>
+                
+                <div class="check-item MISMATCH">
+                    <div class="check-header">
+                        <div class="check-title">
+                            [CHK_03] Stated Part Estimation Cost vs Parsed Part Lines Sum
+                        </div>
+                        <div>
+                            
+                            <span class="badge badge-rose">MISMATCH (22.66%)</span>
+                            
+                        </div>
+                    </div>
+                    <div style="font-size: 13px; display: flex; gap: 20px; color: #e2e8f0; margin-bottom: 6px;">
+                        <span><strong>Stated Part Estimation Cost:</strong> ₹8,111.00</span>
+                        <span><strong>Sum of Parsed Part Lines:</strong> ₹9,948.62</span>
+                        
+                        <span style="color: #fb7185;"><strong>Variance:</strong> ₹1,837.62</span>
+                        
+                    </div>
+                    <div class="check-desc">Stated part estimation cost (₹8,111.00) differs from the sum of parsed part lines (₹9,948.62) by ₹1,837.62 (22.66%).</div>
+                </div>
+                
+                <div class="check-item MATCH">
+                    <div class="check-header">
+                        <div class="check-title">
+                            [CHK_04] Stated Labour Cost vs Parsed Labour Lines Sum
+                        </div>
+                        <div>
+                            
+                            <span class="badge badge-emerald">MATCH</span>
+                            
+                        </div>
+                    </div>
+                    <div style="font-size: 13px; display: flex; gap: 20px; color: #e2e8f0; margin-bottom: 6px;">
+                        <span><strong>Stated Labour Cost:</strong> ₹21,653.00</span>
+                        <span><strong>Sum of Parsed Labour Lines:</strong> ₹21,653.00</span>
+                        
+                    </div>
+                    <div class="check-desc">Stated labour cost matches parsed labour lines sum.</div>
+                </div>
+                
+                <div class="check-item INFO">
+                    <div class="check-header">
+                        <div class="check-title">
+                            [CHK_05] Claims System Final Settled Amount vs System Listed Estimate
+                        </div>
+                        <div>
+                            
+                            <span class="badge badge-blue">INFO</span>
+                            
+                        </div>
+                    </div>
+                    <div style="font-size: 13px; display: flex; gap: 20px; color: #e2e8f0; margin-bottom: 6px;">
+                        <span><strong>Claims System Listed Amount:</strong> ₹26,469.00</span>
+                        <span><strong>Final Settled Amount:</strong> ₹20,947.00</span>
+                        
+                        <span style="color: #fb7185;"><strong>Variance:</strong> ₹5,522.00</span>
+                        
+                    </div>
+                    <div class="check-desc">Final settled amount (₹20,947.00) is ₹5,522.00 (20.86%) lower than system listed estimate (₹26,469.00) after surveyor deductions and depreciation.</div>
+                </div>
+                
+                <div class="check-item MISMATCH">
+                    <div class="check-header">
+                        <div class="check-title">
+                            [CHK_06] Line Items Data Completeness (total_final_amt)
+                        </div>
+                        <div>
+                            
+                            <span class="badge badge-rose">MISMATCH (100.0%)</span>
+                            
+                        </div>
+                    </div>
+                    <div style="font-size: 13px; display: flex; gap: 20px; color: #e2e8f0; margin-bottom: 6px;">
+                        <span><strong>Total Line Items:</strong> ₹5.00</span>
+                        <span><strong>Missing Final Amount Lines:</strong> ₹5.00</span>
+                        
+                        <span style="color: #fb7185;"><strong>Variance:</strong> ₹5.00</span>
+                        
+                    </div>
+                    <div class="check-desc">5 out of 5 line items have 'null' for total_final_amt. Calculated amounts were computed dynamically using base price, depreciation %, and GST %.</div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Itemized Estimate Lines Table -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">🔧 Itemized Estimate Line Items</div>
+                <span class="badge badge-blue">5 Line Items</span>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="center-col">#</th>
+                            <th>Part / Description</th>
+                            <th>Type</th>
+                            <th class="center-col">Qty</th>
+                            <th class="number-col">Stated Unit/Base Amount</th>
+                            <th class="center-col">Dep %</th>
+                            <th class="center-col">GST %</th>
+                            <th class="number-col">Calculated / Final Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td class="center-col" style="color: var(--text-muted);">1</td>
+                            <td style="font-weight: 600;">ASSY FR FASCIA UPPER-0119BU28081N-MAHINDRA</td>
+                            <td style="font-size: 12px; color: #94a3b8;">Plastic</td>
+                            <td class="center-col">1</td>
+                            <td class="number-col">
+                                ₹5,169.92
+                            </td>
+                            <td class="center-col">
+                                0%
+                            </td>
+                            <td class="center-col">
+                                28%
+                            </td>
+                            <td class="number-col" style="font-weight: 600; color: #34d399;">
+                                
+                                    ₹6,617.50 <span style="font-size:10px; color:#94a3b8;">(calc)</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="center-col" style="color: var(--text-muted);">2</td>
+                            <td style="font-weight: 600;">REAR BUMPER BRACKET L-0119BU38073N-MAHINDRA</td>
+                            <td style="font-size: 12px; color: #94a3b8;">Metal</td>
+                            <td class="center-col">1</td>
+                            <td class="number-col">
+                                ₹147.20
+                            </td>
+                            <td class="center-col">
+                                0%
+                            </td>
+                            <td class="center-col">
+                                28%
+                            </td>
+                            <td class="number-col" style="font-weight: 600; color: #34d399;">
+                                
+                                    ₹188.42 <span style="font-size:10px; color:#94a3b8;">(calc)</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="center-col" style="color: var(--text-muted);">3</td>
+                            <td style="font-weight: 600;">BACK LIGHT L-1703AU30221N-MAHINDRA</td>
+                            <td style="font-size: 12px; color: #94a3b8;">Plastic</td>
+                            <td class="center-col">1</td>
+                            <td class="number-col">
+                                ₹4,631.50
+                            </td>
+                            <td class="center-col">
+                                0%
+                            </td>
+                            <td class="center-col">
+                                18%
+                            </td>
+                            <td class="number-col" style="font-weight: 600; color: #34d399;">
+                                
+                                    ₹5,465.17 <span style="font-size:10px; color:#94a3b8;">(calc)</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="center-col" style="color: var(--text-muted);">4</td>
+                            <td style="font-weight: 600;">DENTING CHARGES</td>
+                            <td style="font-size: 12px; color: #94a3b8;">Other</td>
+                            <td class="center-col">1</td>
+                            <td class="number-col">
+                                ₹3,363.00
+                            </td>
+                            <td class="center-col">
+                                0%
+                            </td>
+                            <td class="center-col">
+                                18%
+                            </td>
+                            <td class="number-col" style="font-weight: 600; color: #34d399;">
+                                
+                                    ₹3,968.34 <span style="font-size:10px; color:#94a3b8;">(calc)</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="center-col" style="color: var(--text-muted);">5</td>
+                            <td style="font-weight: 600;">PAINTING CHARGE</td>
+                            <td style="font-size: 12px; color: #94a3b8;">Other</td>
+                            <td class="center-col">1</td>
+                            <td class="number-col">
+                                ₹18,290.00
+                            </td>
+                            <td class="center-col">
+                                0%
+                            </td>
+                            <td class="center-col">
+                                18%
+                            </td>
+                            <td class="number-col" style="font-weight: 600; color: #34d399;">
+                                
+                                    ₹21,582.20 <span style="font-size:10px; color:#94a3b8;">(calc)</span>
+                                
+                            </td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Generated by <strong>Claim Report Generator v1.0</strong> | Source Note: Fields copied from the claims system record (machine-parsed, may contain errors). Not the same thing as the estimate image. Names, IDs, places removed.</p>
+            <p style="margin-top: 4px;">Notice: Black boxes in original estimate scans are intentional redactions. Numbers verified across multiple source records.</p>
+        </div>
+    </div>
+</body>
+</html>
